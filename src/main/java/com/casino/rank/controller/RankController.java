@@ -20,8 +20,6 @@ public class RankController {
     @Autowired
     private CasinoService casinoService;
 
-
-    //Complete
     @GetMapping("/getBalance")
     public ResponseEntity<BalanceResponse> getBalance(@RequestParam String playerId){
         BalanceResponse balanceResponse = casinoService.getBalance(playerId);
