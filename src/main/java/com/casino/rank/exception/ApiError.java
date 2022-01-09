@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 public class ApiError {
     private HttpStatus status;
     private String timestamp;
-    private String message;
-    private String error;
+    private String errorMessage;
 
     private ApiError(){
         this.timestamp = LocalDateTime.now().toString();
@@ -19,7 +18,6 @@ public class ApiError {
     public ApiError(HttpStatus status, Throwable e){
         this();
         this.status = status;
-        this.message = "Error Occurred";
-        this.error = e.getLocalizedMessage();
+        this.errorMessage = e.getLocalizedMessage();
     }
 }
