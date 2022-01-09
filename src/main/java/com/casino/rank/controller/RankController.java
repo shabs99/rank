@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-
 @RestController
 public class RankController {
 
@@ -21,9 +20,9 @@ public class RankController {
     private CasinoService casinoService;
 
     @GetMapping("/getBalance")
-    public ResponseEntity<BalanceResponse> getBalance(@RequestParam String playerId){
+    public ResponseEntity<BalanceResponse> getBalance(@RequestParam String playerId) {
         BalanceResponse balanceResponse = casinoService.getBalance(playerId);
-        if(null != balanceResponse){
+        if (null != balanceResponse) {
             return new ResponseEntity<>(balanceResponse, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -31,37 +30,19 @@ public class RankController {
 
     @PostMapping("/wager")
     public ResponseEntity<WagerResponse> wager(@RequestBody Request request) {
-            WagerResponse wagerResponse = casinoService.wagerBet(request);
-          /*  if (null != wagerResponse) {
-                if (null == wagerResponse.getPlayerId()) {
-                    return new ResponseEntity<>(wagerResponse, HttpStatus.I_AM_A_TEAPOT);
-                }*/
-                return new ResponseEntity<>(wagerResponse, HttpStatus.OK);
-            }
-            //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-       // }
+        WagerResponse wagerResponse = casinoService.wagerBet(request);
+        return new ResponseEntity<>(wagerResponse, HttpStatus.OK);
+    }
 
     @PostMapping("/deposit")
-    public ResponseEntity<DepositResponse> depost(@RequestBody Request request){
+    public ResponseEntity<DepositResponse> depost(@RequestBody Request request) {
         DepositResponse depositResponse = casinoService.depositWinnings(request);
-        /*if(null == depositResponse) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(null == depositResponse.getPlayerId()){
-            return new ResponseEntity<>(depositResponse, HttpStatus.BAD_REQUEST);
-        }*/
         return new ResponseEntity<>(depositResponse, HttpStatus.OK);
     }
 
     @PostMapping("/getTransactions")
     public ResponseEntity<TransactionHistoryResponse> getTransactions(@RequestBody TransactionHistoryRequest request) {
         TransactionHistoryResponse response = casinoService.getTransactionHistory(request);
-       /* if (null == response) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(null == response.getPlayerId()){
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }*/
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

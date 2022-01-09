@@ -1,7 +1,6 @@
 package com.casino.rank.model;
 
 import lombok.Data;
-import lombok.Generated;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

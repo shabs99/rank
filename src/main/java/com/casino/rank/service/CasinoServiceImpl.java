@@ -36,12 +36,12 @@ public class CasinoServiceImpl implements CasinoService {
     PasswordRepo passwordRepo;
 
 
-    public BalanceResponse getBalance(String playerId){
+    public BalanceResponse getBalance(String playerId) {
 
         BalanceResponse response = new BalanceResponse();
         log.info("getting balance");
         Optional<Profile> profile = profileRepo.findById(playerId);
-        if(profile.isPresent()) {
+        if (profile.isPresent()) {
 
             response.setBalance(profile.get().getBalance());
             response.setPlayerId(profile.get().getPlayerId());
@@ -50,16 +50,16 @@ public class CasinoServiceImpl implements CasinoService {
             return response;
         }
         log.info("failed to get balance");
-        throw new BadRequestException("Invalid PlayerId : "+ playerId);
+        throw new BadRequestException("Invalid PlayerId : " + playerId);
     }
 
 
     public DepositResponse depositWinnings(Request request) {
         log.info("depositing winnings");
         DepositResponse response = new DepositResponse();
-        if(!Validator.isValidAmount(request.getAmount())){
+        if (!Validator.isValidAmount(request.getAmount())) {
             log.info("Invalid Amount");
-            throw new BadRequestException("Invalid Amount : Amount should be greater than 0" );
+            throw new BadRequestException("Invalid Amount : Amount should be greater than 0");
         }
         Optional<Profile> profile = profileRepo.findById(request.getPlayerId());
         if (profile.isPresent()) {
@@ -76,15 +76,15 @@ public class CasinoServiceImpl implements CasinoService {
                 return response;
             }
             log.info("failed to deposit Winnings: Invalid TransactionId");
-            throw  new BadRequestException("Invalid PlayerId : "+request.getPlayerId());
+            throw new BadRequestException("Invalid PlayerId : " + request.getPlayerId());
         }
         log.info("failed to deposit Winnings: Invalid PlayerId");
-        throw  new BadRequestException("Invalid PlayerId : "+request.getPlayerId());
+        throw new BadRequestException("Invalid PlayerId : " + request.getPlayerId());
     }
 
     public WagerResponse wagerBet(Request request) {
         log.info("Wagering");
-        if(!Validator.isValidAmount(request.getAmount())){
+        if (!Validator.isValidAmount(request.getAmount())) {
             log.info("Invalid Amount");
             throw new BadRequestException("Invalid Amount : Amount should be greater than 0");
         }
@@ -122,7 +122,7 @@ public class CasinoServiceImpl implements CasinoService {
             }
         }
         log.info("Failed to make Transaction:  Invalid UserId");
-        throw  new BadRequestException("Invalid PlayerId : "+request.getPlayerId());
+        throw new BadRequestException("Invalid PlayerId : " + request.getPlayerId());
     }
 
     public TransactionHistoryResponse getTransactionHistory(TransactionHistoryRequest request) {
@@ -133,26 +133,26 @@ public class CasinoServiceImpl implements CasinoService {
             List<Transaction> transactionList = transactionRepo.getAllByPlayerId(request.getPlayerId());
             Collections.reverse(transactionList);
             List<Transaction> subTransactions;
-            if(transactionList.isEmpty()){
+            if (transactionList.isEmpty()) {
                 log.info("No Transactions");
                 response.setMessage("No Transactions");
                 return response;
             }
-            int size  = transactionList.size();
-            if(size>10){
+            int size = transactionList.size();
+            if (size > 10) {
                 subTransactions = transactionList.subList(0, 10);
                 response.setTransactionList(subTransactions);
                 log.info("Transactions Retrieved Successfully");
                 response.setMessage("Successful");
                 return response;
             }
-                subTransactions = transactionList;
-                response.setTransactionList(subTransactions);
-                response.setMessage("Successful");
-                log.info("Transactions Retrieved Successfuly");
-                return response;
+            subTransactions = transactionList;
+            response.setTransactionList(subTransactions);
+            response.setMessage("Successful");
+            log.info("Transactions Retrieved Successfuly");
+            return response;
         }
         log.info("Failed to retrieve Transactions: Invalid Password");
-        throw  new BadRequestException("Invalid Password");
+        throw new BadRequestException("Invalid Password");
     }
 }

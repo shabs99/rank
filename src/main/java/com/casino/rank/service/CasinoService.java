@@ -11,7 +11,10 @@ import com.casino.rank.model.response.WagerResponse;
 public interface CasinoService {
 
     WagerResponse wagerBet(Request request);
+
     DepositResponse depositWinnings(Request request);
+
     BalanceResponse getBalance(String playerId);
+
     TransactionHistoryResponse getTransactionHistory(TransactionHistoryRequest request);
 }

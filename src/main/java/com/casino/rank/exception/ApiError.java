@@ -11,11 +11,11 @@ public class ApiError {
     private String timestamp;
     private String errorMessage;
 
-    private ApiError(){
+    private ApiError() {
         this.timestamp = LocalDateTime.now().toString();
     }
 
-    public ApiError(HttpStatus status, Throwable e){
+    public ApiError(HttpStatus status, Throwable e) {
         this();
         this.status = status;
         this.errorMessage = e.getLocalizedMessage();

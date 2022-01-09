@@ -1,4 +1,5 @@
 package com.casino.rank.model.response;
+
 import lombok.Data;
 
 @Data
