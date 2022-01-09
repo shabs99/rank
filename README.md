@@ -1,5 +1,7 @@
 # casino-roayal
- brand-new casino back-end system
+A sample casino back-end system.. 
+
+Basic Spring-boot maven service
 
 
 url:  localhost:8080/casino-royal/....
