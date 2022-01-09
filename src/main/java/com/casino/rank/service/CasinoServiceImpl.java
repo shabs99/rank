@@ -1,5 +1,7 @@
 package com.casino.rank.service;
 
+import com.casino.rank.exception.BadRequestException;
+import com.casino.rank.exception.InsufficientAmountException;
 import com.casino.rank.model.Profile;
 import com.casino.rank.model.Transaction;
 import com.casino.rank.model.request.Request;
@@ -11,10 +13,12 @@ import com.casino.rank.model.response.WagerResponse;
 import com.casino.rank.repository.PasswordRepo;
 import com.casino.rank.repository.ProfileRepo;
 import com.casino.rank.repository.TransactionRepo;
+import com.casino.rank.util.Validator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,25 +35,32 @@ public class CasinoServiceImpl implements CasinoService {
     @Autowired
     PasswordRepo passwordRepo;
 
+
     public BalanceResponse getBalance(String playerId){
 
+        BalanceResponse response = new BalanceResponse();
         log.info("getting balance");
         Optional<Profile> profile = profileRepo.findById(playerId);
         if(profile.isPresent()) {
-            BalanceResponse response = new BalanceResponse();
+
             response.setBalance(profile.get().getBalance());
             response.setPlayerId(profile.get().getPlayerId());
+            response.setMessage("Successful");
             log.info("balance retrieved successfully");
             return response;
         }
         log.info("failed to get balance");
-        return null;
-
+        throw new BadRequestException("Invalid PlayerId : "+ playerId);
     }
 
 
     public DepositResponse depositWinnings(Request request) {
         log.info("depositing winnings");
+        DepositResponse response = new DepositResponse();
+        if(!Validator.isValidAmount(request.getAmount())){
+            log.info("Invalid Amount");
+            throw new BadRequestException("Invalid Amount : Amount should be greater than 0" );
+        }
         Optional<Profile> profile = profileRepo.findById(request.getPlayerId());
         if (profile.isPresent()) {
             Optional<Transaction> transaction = transactionRepo.findById(request.getTransactionId());
@@ -57,7 +68,7 @@ public class CasinoServiceImpl implements CasinoService {
                 double balance = profile.get().getBalance() + request.getAmount();
                 profileRepo.updatePlayerProfileBalance(request.getPlayerId(), balance);
                 transactionRepo.updateTransactionWinnings(request.getTransactionId(), request.getAmount());
-                DepositResponse response = new DepositResponse();
+
                 response.setBalance(balance);
                 response.setMessage("Successful");
                 response.setPlayerId(request.getPlayerId());
@@ -65,14 +76,19 @@ public class CasinoServiceImpl implements CasinoService {
                 return response;
             }
             log.info("failed to deposit Winnings: Invalid TransactionId");
-            return null;
+            throw  new BadRequestException("Invalid PlayerId : "+request.getPlayerId());
         }
         log.info("failed to deposit Winnings: Invalid PlayerId");
-        return null;
+        throw  new BadRequestException("Invalid PlayerId : "+request.getPlayerId());
     }
 
-    public WagerResponse wageBet(Request request) {
+    public WagerResponse wagerBet(Request request) {
         log.info("Wagering");
+        if(!Validator.isValidAmount(request.getAmount())){
+            log.info("Invalid Amount");
+            throw new BadRequestException("Invalid Amount : Amount should be greater than 0");
+        }
+
         Optional<Profile> profile = profileRepo.findById(request.getPlayerId());
         if (profile.isPresent()) {
             Optional<Transaction> transaction = transactionRepo.findById(request.getTransactionId());
@@ -84,7 +100,7 @@ public class CasinoServiceImpl implements CasinoService {
                 log.info("Duplicate TransactionId");
                 return wagerResponse;
             }
-            if (profile.get().getBalance() > request.getAmount()) {
+            if (profile.get().getBalance() >= request.getAmount()) {
                 double balance = profile.get().getBalance() - request.getAmount();
                 profileRepo.updatePlayerProfileBalance(request.getPlayerId(), balance);
                 Transaction transaction1 = new Transaction();
@@ -101,26 +117,25 @@ public class CasinoServiceImpl implements CasinoService {
                 return wagerResponse;
 
             } else {
-                WagerResponse wagerResponse = new WagerResponse();
-                wagerResponse.setMessage("OUT OF FUNDS");
                 log.info("Failed to make Transaction: Insufficient funds");
-                return wagerResponse;
+                throw new InsufficientAmountException("Failed to make Transaction: Insufficient funds");
             }
         }
         log.info("Failed to make Transaction:  Invalid UserId");
-        return null;
+        throw  new BadRequestException("Invalid PlayerId : "+request.getPlayerId());
     }
 
     public TransactionHistoryResponse getTransactionHistory(TransactionHistoryRequest request) {
 
         TransactionHistoryResponse response = new TransactionHistoryResponse();
         response.setPlayerId(request.getPlayerId());
-
         if (passwordRepo.existsById(request.getPassword())) {
             List<Transaction> transactionList = transactionRepo.getAllByPlayerId(request.getPlayerId());
+            Collections.reverse(transactionList);
             List<Transaction> subTransactions;
             if(transactionList.isEmpty()){
                 log.info("No Transactions");
+                response.setMessage("No Transactions");
                 return response;
             }
             int size  = transactionList.size();
@@ -128,14 +143,16 @@ public class CasinoServiceImpl implements CasinoService {
                 subTransactions = transactionList.subList(0, 10);
                 response.setTransactionList(subTransactions);
                 log.info("Transactions Retrieved Successfully");
+                response.setMessage("Successful");
                 return response;
             }
                 subTransactions = transactionList;
                 response.setTransactionList(subTransactions);
+                response.setMessage("Successful");
                 log.info("Transactions Retrieved Successfuly");
                 return response;
         }
         log.info("Failed to retrieve Transactions: Invalid Password");
-        return null;
+        throw  new BadRequestException("Invalid Password");
     }
 }

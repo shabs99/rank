@@ -6,4 +6,5 @@ import lombok.Data;
 public class BalanceResponse {
     private String PlayerId;
     private double balance;
+    private String message;
 }

@@ -8,4 +8,5 @@ import java.util.List;
 public class TransactionHistoryResponse {
     private String playerId;
     private List<Transaction> transactionList;
+    private String message;
 }

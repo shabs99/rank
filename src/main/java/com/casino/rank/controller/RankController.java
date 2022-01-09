@@ -29,33 +29,39 @@ public class RankController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/wage")
-    public ResponseEntity<WagerResponse> wage(@RequestBody Request request) {
-            WagerResponse wagerResponse = casinoService.wageBet(request);
-            if (null != wagerResponse) {
+    @PostMapping("/wager")
+    public ResponseEntity<WagerResponse> wager(@RequestBody Request request) {
+            WagerResponse wagerResponse = casinoService.wagerBet(request);
+          /*  if (null != wagerResponse) {
                 if (null == wagerResponse.getPlayerId()) {
                     return new ResponseEntity<>(wagerResponse, HttpStatus.I_AM_A_TEAPOT);
-                }
+                }*/
                 return new ResponseEntity<>(wagerResponse, HttpStatus.OK);
             }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+            //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+       // }
 
     @PostMapping("/deposit")
     public ResponseEntity<DepositResponse> depost(@RequestBody Request request){
         DepositResponse depositResponse = casinoService.depositWinnings(request);
-        if(null != depositResponse){
-            return  new ResponseEntity<>(depositResponse, HttpStatus.OK);
+        /*if(null == depositResponse) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(null == depositResponse.getPlayerId()){
+            return new ResponseEntity<>(depositResponse, HttpStatus.BAD_REQUEST);
+        }*/
+        return new ResponseEntity<>(depositResponse, HttpStatus.OK);
     }
 
     @PostMapping("/getTransactions")
     public ResponseEntity<TransactionHistoryResponse> getTransactions(@RequestBody TransactionHistoryRequest request) {
         TransactionHistoryResponse response = casinoService.getTransactionHistory(request);
-        if (null == response) {
+       /* if (null == response) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        if(null == response.getPlayerId()){
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }*/
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
